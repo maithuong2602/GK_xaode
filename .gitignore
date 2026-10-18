@@ -43,3 +43,5 @@ scratch/
 debug_*.py
 test_*.docx
 test_*.xlsx
+cloudflared.exe
+
