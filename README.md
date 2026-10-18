@@ -2,6 +2,11 @@
 
 Ứng dụng web chuyên nghiệp dành cho Giáo viên và Nhà trường giúp xáo đề thi trắc nghiệm từ file Microsoft Word (`.docx`) và PDF với cam kết **Bảo toàn 100% định dạng gốc**: giữ nguyên vẹn bảng biểu, in đậm, in nghiêng, công thức, lề trang, section và font chữ.
 
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/maithuong2602/GK_xaode)
+
+> 🚀 **Chạy trực tiếp trên trình duyệt mà không cần cài đặt:** Bấm vào nút **"Open in GitHub Codespaces"** ở trên để khởi chạy ứng dụng trực tiếp trên đám mây của GitHub hoàn toàn miễn phí!
+
 ---
 
 ## 🌟 Tính Năng Nổi Bật
