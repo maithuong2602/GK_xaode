@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phần Mềm Xáo Đề Thi Word & PDF Giữ Nguyên Định Dạng Gốc (OOXML)</title>
+  <meta name="description" content="Ứng dụng chuyên nghiệp dành cho giáo viên xáo đề kiểm tra từ Word hoặc PDF, bảo toàn 100% định dạng gốc, font chữ, bảng biểu, hình ảnh và công thức toán học.">
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- Loading Spinner Overlay -->
+  <div id="loaderOverlay" class="loader-overlay">
+    <div class="spinner"></div>
+    <div id="loaderText" class="loader-text">Đang phân tích cấu trúc tài liệu...</div>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <!-- Shuffle icon SVG -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 3 21 3 21 8"></polyline>
+            <line x1="4" y1="20" x2="21" y2="3"></line>
+            <polyline points="21 16 21 21 16 21"></polyline>
+            <line x1="15" y1="15" x2="21" y2="21"></line>
+            <line x1="4" y1="4" x2="9" y2="9"></line>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <h1>XÁO ĐỀ THI THÔNG MINH</h1>
+          <p>Bảo toàn 100% định dạng OOXML Word & PDF</p>
+        </div>
+      </div>
+
+      <div class="header-badges">
+        <span class="badge-tag badge-ooxml">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          Chuẩn OOXML Khép Kín
+        </span>
+        <button id="btnResetApp" class="btn-prev" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; display: none;">
+          Tải file mới
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="main-container">
+
+    <!-- 6-Step Stepper Card -->
+    <div class="stepper-card">
+      <nav class="stepper-nav" aria-label="Các bước thực hiện">
+        <button class="step-item active" id="stepNav1" onclick="app.goToStep(1)">
+          <span class="step-number">1</span>
+          <span>Tải đề thi</span>
+        </button>
+        <button class="step-item" id="stepNav2" onclick="app.goToStep(2)" disabled>
+          <span class="step-number">2</span>
+          <span>Phân tích</span>
+        </button>
+        <button class="step-item" id="stepNav3" onclick="app.goToStep(3)" disabled>
+          <span class="step-number">3</span>
+          <span>Kiểm tra câu hỏi</span>
+        </button>
+        <button class="step-item" id="stepNav4" onclick="app.goToStep(4)" disabled>
+          <span class="step-number">4</span>
+          <span>Cấu hình xáo</span>
+        </button>
+        <button class="step-item" id="stepNav5" onclick="app.goToStep(5)" disabled>
+          <span class="step-number">5</span>
+          <span>Xem trước</span>
+        </button>
+        <button class="step-item" id="stepNav6" onclick="app.goToStep(6)" disabled>
+          <span class="step-number">6</span>
+          <span>Xuất mã đề</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- ==================== BƯỚC 1: TẢI ĐỀ THI ==================== -->
+    <section id="step1" class="step-content active">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              Bước 1: Chọn hoặc kéo thả tệp đề thi (.docx hoặc .pdf)
+            </h2>
+            <p class="card-desc">Hỗ trợ đề thi trắc nghiệm A-D, Đúng/Sai, Tự luận, có chứa bảng biểu, hình ảnh hoặc công thức toán học.</p>
+          </div>
+        </div>
+
+        <div class="upload-dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+          <input type="file" id="fileInput" accept=".docx,.pdf" style="display: none;" onchange="app.handleFileSelect(event)">
+          <div class="upload-icon-wrapper">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          </div>
+          <h3 class="upload-title">Kéo & thả tệp đề thi Word hoặc PDF vào đây</h3>
+          <p class="upload-subtitle">hoặc bấm vào khung để duyệt file từ máy tính của bạn</p>
+          <button type="button" class="btn-upload">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            Chọn file từ máy tính
+          </button>
+        </div>
+
+        <!-- Preloaded Samples for 1-Click Testing -->
+        <div class="samples-box">
+          <div class="samples-title">Hoặc thử nghiệm ngay với đề thi thực tế có sẵn:</div>
+          <div class="samples-grid">
+            <div class="sample-chip" onclick="app.loadSample('New_GK1 TIN 7-26-27-THUONG.docx')">
+              <div class="sample-info">
+                <span style="color:#2563eb; font-weight:700;">📄 DOCX</span>
+                <span>Đề Tin học 7 (Lê Hồng Phong)</span>
+              </div>
+              <span style="font-size:0.75rem; color:#64748b;">30 câu</span>
+            </div>
+            <div class="sample-chip" onclick="app.loadSample('New_GK1 TIN 9-26-27-THUONG.docx')">
+              <div class="sample-info">
+                <span style="color:#2563eb; font-weight:700;">📄 DOCX</span>
+                <span>Đề Tin học 9 (Lê Hồng Phong)</span>
+              </div>
+              <span style="font-size:0.75rem; color:#64748b;">29 câu</span>
+            </div>
+            <div class="sample-chip" onclick="app.loadSample('New_GK1 TIN 7-26-27-THUONG.pdf')">
+              <div class="sample-info">
+                <span style="color:#dc2626; font-weight:700;">📕 PDF</span>
+                <span>Đề Tin học 7 (Bản PDF)</span>
+              </div>
+              <span style="font-size:0.75rem; color:#64748b;">Kiểm tra PDF</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== BƯỚC 2: PHÂN TÍCH ĐỀ ==================== -->
+    <section id="step2" class="step-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              Bước 2: Kết quả phân tích cấu trúc đề thi
+            </h2>
+            <p class="card-desc" id="analysisFileName">Đang hiển thị thông tin chi tiết cấu trúc đề thi...</p>
+          </div>
+          <button class="btn-nav btn-next" onclick="app.goToStep(3)">
+            Tiếp tục duyệt câu hỏi →
+          </button>
+        </div>
+
+        <!-- Scanned PDF warning if applicable -->
+        <div id="pdfWarningBox" class="alert-box alert-warning" style="display: none;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <div id="pdfWarningText"></div>
+        </div>
+
+        <!-- Format safety badge -->
+        <div class="alert-box alert-success" id="ooxmlSafeBadge">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          <div>
+            <strong>Đã xác thực tính toàn vẹn cấu trúc OOXML:</strong> Tài liệu chứa đầy đủ thẻ định dạng gốc. Khi sinh mã đề, hệ thống sẽ di chuyển nguyên khối (Block) của từng câu hỏi, đảm bảo giữ 100% bảng biểu, căn lề và font chữ.
+          </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#eff6ff; color:#2563eb;">📚</div>
+            <div>
+              <div class="stat-val" id="statTotalQ">0</div>
+              <div class="stat-label">Tổng số câu hỏi</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#ecfdf5; color:#059669;">🔘</div>
+            <div>
+              <div class="stat-val" id="statMcQ">0</div>
+              <div class="stat-label">Trắc nghiệm A-D</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#fffbeb; color:#d97706;">⚖️</div>
+            <div>
+              <div class="stat-val" id="statTfQ">0</div>
+              <div class="stat-label">Đúng / Sai</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#f5f3ff; color:#7c3aed;">✍️</div>
+            <div>
+              <div class="stat-val" id="statEssayQ">0</div>
+              <div class="stat-label">Tự luận</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sections breakdown -->
+        <h3 style="font-size:1.05rem; font-weight:700; margin:1.5rem 0 0.75rem;">Các phần phát hiện trong đề:</h3>
+        <div id="sectionsOverviewList" style="display:flex; flex-direction:column; gap:0.75rem;">
+          <!-- Dynamically populated -->
+        </div>
+
+        <div class="step-actions-bar">
+          <button class="btn-nav btn-prev" onclick="app.goToStep(1)">← Quay lại</button>
+          <button class="btn-nav btn-next" onclick="app.goToStep(3)">Kiểm tra câu hỏi →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== BƯỚC 3: KIỂM TRA CÂU HỎI & ĐÁP ÁN ==================== -->
+    <section id="step3" class="step-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+              Bước 3: Kiểm tra nhận diện câu hỏi & Quản lý đáp án
+            </h2>
+            <p class="card-desc">Thầy/Cô có thể kiểm tra từng câu hỏi, khóa vị trí câu không muốn xáo (🔒), chọn đáp án đúng hoặc paste chuỗi đáp án nhanh.</p>
+          </div>
+          <button class="btn-nav btn-next" onclick="app.goToStep(4)">
+            Cấu hình xáo đề →
+          </button>
+        </div>
+
+        <!-- Answers Toolbar -->
+        <div class="answers-toolbar">
+          <div class="toolbar-stats" id="answersSummaryText">
+            Đã có đáp án cho: <strong>0/0</strong> câu hỏi
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn-prev" onclick="app.openPasteAnswerModal()" style="font-size:0.85rem; padding:0.5rem 1rem;">
+              📋 Dán chuỗi đáp án (Paste nhanh)
+            </button>
+            <button class="btn-prev" onclick="app.autoFillAnswersFromDoc()" style="font-size:0.85rem; padding:0.5rem 1rem;">
+              🔄 Khôi phục đáp án gốc
+            </button>
+          </div>
+        </div>
+
+        <!-- Question Cards List -->
+        <div class="questions-container" id="questionsList">
+          <!-- Question cards dynamically populated -->
+        </div>
+
+        <div class="step-actions-bar">
+          <button class="btn-nav btn-prev" onclick="app.goToStep(2)">← Quay lại</button>
+          <button class="btn-nav btn-next" onclick="app.goToStep(4)">Cấu hình xáo đề →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== BƯỚC 4: CẤU HÌNH XÁO ĐỀ ==================== -->
+    <section id="step4" class="step-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+              Bước 4: Thiết lập thông số xáo đề
+            </h2>
+            <p class="card-desc">Tùy chỉnh số lượng mã đề, mã bắt đầu, xáo theo từng phần độc lập và tính tái lập (Seed).</p>
+          </div>
+        </div>
+
+        <div class="config-grid">
+          <!-- Left Column: Variant Settings -->
+          <div>
+            <div class="form-group">
+              <label class="form-label" for="inputNumVariants">Số lượng mã đề cần tạo:</label>
+              <input type="number" id="inputNumVariants" class="form-input" value="4" min="1" max="20" onchange="app.updateVariantCodesPreview()">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inputStartCode">Mã đề bắt đầu:</label>
+              <input type="number" id="inputStartCode" class="form-input" value="101" min="1" max="9999" onchange="app.updateVariantCodesPreview()">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Danh sách mã đề dự kiến:</label>
+              <div id="previewVariantCodesList" style="display:flex; gap:0.5rem; flex-wrap:wrap; font-weight:700; color:#2563eb;">
+                <span class="badge-tag" style="background:#eff6ff;">101</span>
+                <span class="badge-tag" style="background:#eff6ff;">102</span>
+                <span class="badge-tag" style="background:#eff6ff;">103</span>
+                <span class="badge-tag" style="background:#eff6ff;">104</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inputSeed">
+                Mã Seed (Tái lập kết quả xáo khi cần):
+              </label>
+              <div style="display: flex; gap: 0.5rem;">
+                <input type="number" id="inputSeed" class="form-input" value="20261018">
+                <button type="button" class="btn-prev" onclick="app.randomizeSeed()" style="white-space: nowrap;">
+                  🎲 Đổi Seed
+                </button>
+              </div>
+              <small style="color:var(--text-muted); font-size:0.8rem; margin-top:0.25rem; display:block;">
+                Dùng cùng một file gốc và mã Seed này sẽ luôn tạo ra kết quả xáo giống nhau 100%.
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="chkKeepWithNext">
+                <span><strong>Giữ câu hỏi đi liền với phương án đầu tiên (Tránh tiêu đề câu hỏi nằm cô đơn ở dòng cuối trang):</strong> Mặc định bỏ chọn để dàn trang tự nhiên bám sát 100% file gốc, giúp đề thi đầy đặn, tiết kiệm giấy in và tuyệt đối không tạo khoảng trắng thừa ở cuối trang.</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Right Column: Section Controls (Xáo theo nhóm) -->
+          <div>
+            <label class="form-label">Tùy chọn xáo theo từng phần (Section Grouping):</label>
+            <div id="sectionsConfigContainer">
+              <!-- Dynamically populated sections with checkboxes -->
+            </div>
+          </div>
+        </div>
+
+        <div class="step-actions-bar">
+          <button class="btn-nav btn-prev" onclick="app.goToStep(3)">← Quay lại</button>
+          <button class="btn-nav btn-next" onclick="app.executeShuffle()" style="background:#059669;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Bắt đầu sinh mã đề & Xem trước →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== BƯỚC 5: XEM TRƯỚC & SO SÁNH ==================== -->
+    <section id="step5" class="step-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              Bước 5: Xem trước mã đề & Kiểm tra đối chiếu câu hỏi
+            </h2>
+            <p class="card-desc">Kiểm tra chính xác vị trí câu hỏi mới so với đề gốc, đối chiếu hoán vị phương án và xem ma trận vị trí tổng hợp.</p>
+          </div>
+          <button class="btn-nav btn-next" onclick="app.goToStep(6)">
+            Tiến hành xuất file →
+          </button>
+        </div>
+
+        <!-- Integrity Verification Banner -->
+        <div class="alert-box alert-success" id="integrityBox">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <div>
+            <div style="font-weight: 700; font-size: 1.05rem;" id="integrityTitle">
+              🛡️ ĐÃ KIỂM TRA ĐẠT TIÊU CHÍ AN TOÀN 100%
+            </div>
+            <ul id="integrityList" style="margin-left: 1.25rem; font-size: 0.9rem; margin-top: 0.25rem;">
+              <!-- Verification items -->
+            </ul>
+          </div>
+        </div>
+
+        <!-- Main View Switcher: Single Variant vs Position Matrix -->
+        <div class="view-mode-tabs">
+          <button type="button" id="tabBtnPerVariant" class="view-mode-btn active" onclick="app.switchStep5Tab('single')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            Chi tiết từng mã đề
+          </button>
+          <button type="button" id="tabBtnMatrix" class="view-mode-btn" onclick="app.switchStep5Tab('matrix')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg>
+            📊 Ma trận vị trí câu hỏi (Tất cả mã đề)
+          </button>
+        </div>
+
+        <!-- VIEW 1: Single Variant Details -->
+        <div id="singleVariantViewArea">
+          <!-- Variant Tabs -->
+          <div class="preview-tabs" id="variantTabs">
+            <!-- Dynamically populated buttons: 101, 102, 103, 104... -->
+          </div>
+
+          <!-- Sub-toolbar: Teacher vs Student copy toggle & Quick downloads -->
+          <div class="preview-toolbar">
+            <div class="toggle-mode-group">
+              <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted); margin-right:0.35rem;">Hiển thị:</span>
+              <button type="button" id="btnPreviewTeacherMode" class="btn-toggle-mode active" onclick="app.setPreviewCopyMode('teacher')">
+                📑 Bản giáo viên (Kèm đáp án & Vị trí gốc)
+              </button>
+              <button type="button" id="btnPreviewStudentMode" class="btn-toggle-mode" onclick="app.setPreviewCopyMode('student')">
+                👨‍🎓 Bản học sinh (Chỉ đề thi)
+              </button>
+            </div>
+            <div class="quick-download-actions">
+              <button type="button" class="btn-quick-dl btn-quick-student" onclick="app.downloadActiveVariant('student')">
+                📄 Tải Word chỉ đề thi
+              </button>
+              <button type="button" class="btn-quick-dl btn-quick-teacher" onclick="app.downloadActiveVariant('teacher')">
+                📑 Tải Word kèm đáp án & gốc
+              </button>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin:1rem 0 0.5rem;">
+            <h3 id="currentPreviewHeading" style="font-size:1.1rem; font-weight:700; color:var(--secondary);">
+              Chi tiết Mã đề 101
+            </h3>
+            <div id="previewModeDescription" style="font-size: 0.85rem; color: #0284c7; background:#e0f2fe; padding:0.25rem 0.75rem; border-radius:12px; font-weight:500;">
+              Đang hiển thị bản giáo viên có chú thích câu gốc và đáp án
+            </div>
+          </div>
+
+          <!-- Mapping Table -->
+          <div style="overflow-x:auto;">
+            <table class="mapping-table" id="variantMappingTable">
+              <thead>
+                <tr>
+                  <th style="width: 120px;">Vị trí mới</th>
+                  <th style="width: 150px;">Vị trí ở Đề gốc</th>
+                  <th class="col-answer" style="width: 110px;">Đáp án gốc</th>
+                  <th class="col-answer" style="width: 120px;">Đáp án mới</th>
+                  <th>Trích đoạn nội dung câu hỏi</th>
+                </tr>
+              </thead>
+              <tbody id="variantMappingBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW 2: All Variants Question Position Matrix -->
+        <div id="matrixViewArea" style="display: none;">
+          <div class="matrix-info-banner">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <div>
+              <strong>Bảng tra cứu ma trận vị trí tổng hợp:</strong> Thầy/Cô có thể tra cứu nhanh một câu hỏi ở đề gốc đang nằm ở <strong>câu số mấy</strong> trong từng mã đề mới tương ứng.
+            </div>
+          </div>
+
+          <div style="overflow-x:auto; margin-top:1rem;">
+            <table class="mapping-table matrix-table" id="allVariantsMatrixTable">
+              <thead id="allVariantsMatrixHead">
+                <!-- Dynamically populated columns -->
+              </thead>
+              <tbody id="allVariantsMatrixBody">
+                <!-- Dynamically populated rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="step-actions-bar">
+          <button class="btn-nav btn-prev" onclick="app.goToStep(4)">← Sửa cấu hình</button>
+          <button class="btn-nav btn-next" onclick="app.goToStep(6)">Xuất file & Tải trọn bộ →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== BƯỚC 6: XUẤT MÃ ĐỀ ==================== -->
+    <section id="step6" class="step-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Bước 6: Tải xuống các mã đề và bảng đáp án
+            </h2>
+            <p class="card-desc">Thầy/Cô có thể chọn tải chỉ đề thi (phát cho học sinh làm bài) hoặc tải đề thi kèm đáp án (dành cho giáo viên chấm).</p>
+          </div>
+        </div>
+
+        <!-- Export Grid -->
+        <div class="export-grid">
+          <!-- Card 1: ZIP Archive -->
+          <div class="export-card" style="border-color: #2563eb; background: #f8fbff;">
+            <div>
+              <div class="export-icon" style="background:#eff6ff; color:#2563eb;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+              </div>
+              <h3 class="export-name">Trọn bộ đề thi (.ZIP)</h3>
+              <p class="export-desc">Tải về một file ZIP nén toàn bộ tài liệu đã xáo. Chọn gói tải phù hợp với nhu cầu sử dụng:</p>
+            </div>
+            
+            <div style="display:flex; flex-direction:column; gap:0.5rem; width:100%;">
+              <button class="btn-download-action btn-primary-action" onclick="app.downloadZip('all')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                📦 Tải trọn bộ ZIP (Cả 2 bản: HS & GV)
+              </button>
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+                <button class="btn-sub-action" onclick="app.downloadZip('student')" title="Chỉ tải các đề thi học sinh (sạch không đáp án)">
+                  📄 Chỉ đề học sinh
+                </button>
+                <button class="btn-sub-action" onclick="app.downloadZip('teacher')" title="Chỉ tải các đề kèm đáp án và đối chiếu câu gốc">
+                  📑 Đề GV kèm đáp án
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Excel Matrix -->
+          <div class="export-card">
+            <div>
+              <div class="export-icon" style="background:#ecfdf5; color:#059669;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+              </div>
+              <h3 class="export-name">Ma trận ánh xạ Excel</h3>
+              <p class="export-desc">Bảng tra cứu đối chiếu câu mới - câu gốc và bảng tổng hợp đáp án các mã đề để nhập điểm.</p>
+            </div>
+            <button class="btn-download-action btn-success-action" onclick="app.downloadExcel()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Tải Bang_Anh_Xa.xlsx
+            </button>
+          </div>
+
+          <!-- Card 3: Answer Key Docx -->
+          <div class="export-card">
+            <div>
+              <div class="export-icon" style="background:#eff6ff; color:#0284c7;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              </div>
+              <h3 class="export-name">Bảng đáp án Word</h3>
+              <p class="export-desc">File Word trình bày bảng đáp án chuẩn đẹp sẵn sàng in ấn cho giáo viên chấm bài.</p>
+            </div>
+            <button class="btn-download-action btn-primary-action" onclick="app.downloadAnswerDocx()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Tải Dap_An.docx
+            </button>
+          </div>
+        </div>
+
+        <!-- Individual Word files list -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+          <h3 style="font-size:1.1rem; font-weight:700; color:var(--secondary);">
+            Tải riêng từng mã đề Word (.docx):
+          </h3>
+          <span style="font-size:0.85rem; color:var(--text-muted);">
+            Thầy/Cô có thể tải trực tiếp bản chỉ đề thi (phát HS) hoặc bản kèm đáp án & đối chiếu câu gốc (giáo viên).
+          </span>
+        </div>
+
+        <div id="individualDownloadsList" class="variant-downloads-grid">
+          <!-- Dynamically populated variant cards -->
+        </div>
+
+        <div class="step-actions-bar">
+          <button class="btn-nav btn-prev" onclick="app.goToStep(5)">← Xem lại bản preview</button>
+          <button class="btn-nav btn-prev" onclick="app.resetAll()">Tạo đợt xáo mới 🔄</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal: Confirm Export Choice Before Download -->
+    <div id="exportChoiceModal" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 class="modal-title" id="exportModalTitle">Tùy chọn xuất file đề thi</h3>
+          <button class="modal-close" onclick="app.closeExportChoiceModal()">&times;</button>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1.25rem;">
+          Thầy/Cô vui lòng chọn định dạng cần xuất cho đề thi này:
+        </p>
+
+        <div class="export-choice-options">
+          <label class="export-choice-card active" id="optCardStudent" onclick="app.selectModalExportOption('student')">
+            <input type="radio" name="exportOptionRadio" id="radioOptStudent" value="student" checked>
+            <div class="choice-content">
+              <div class="choice-title">
+                <span>👨‍🎓 Chỉ hiển thị đề thi (Bản học sinh)</span>
+                <span class="badge-tag" style="background:#eff6ff; color:#2563eb;">Khuyên dùng in phát</span>
+              </div>
+              <div class="choice-desc">
+                Đề thi sạch sẽ, các câu hỏi đánh số từ 1 đến N. Đã xóa bỏ toàn bộ phần đáp án và hướng dẫn chấm cuối đề thi.
+              </div>
+            </div>
+          </label>
+
+          <label class="export-choice-card" id="optCardTeacher" onclick="app.selectModalExportOption('teacher')">
+            <input type="radio" name="exportOptionRadio" id="radioOptTeacher" value="teacher">
+            <div class="choice-content">
+              <div class="choice-title">
+                <span>📑 Hiển thị kèm đáp án (Bản giáo viên)</span>
+                <span class="badge-tag" style="background:#ecfdf5; color:#059669;">Có chú thích câu gốc</span>
+              </div>
+              <div class="choice-desc">
+                Tại mỗi câu hỏi có chú thích rõ: <code>Câu 1 (Gốc: Câu 17).</code> Đính kèm bảng đáp án mới và bảng đối chiếu chi tiết giữa câu mới và câu gốc ở trang cuối.
+              </div>
+            </div>
+          </label>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:1.5rem;">
+          <button type="button" class="btn-prev" onclick="app.closeExportChoiceModal()">Hủy bỏ</button>
+          <button type="button" class="btn-nav btn-next" id="btnConfirmExportAction" onclick="app.confirmExportModalAction()">
+            Tải xuống ngay
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal: Paste Answer Key -->
+  <div id="pasteAnswerModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Dán chuỗi đáp án nhanh</h3>
+        <button class="modal-close" onclick="app.closePasteAnswerModal()">&times;</button>
+      </div>
+      <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1rem;">
+        Thầy/Cô có thể dán theo bất kỳ định dạng nào (ví dụ: <code>C A D B B C A...</code> hoặc <code>1C 2A 3D 4B...</code> hoặc <code>Câu 1: C, Câu 2: A...</code>):
+      </p>
+      <textarea id="rawAnswerInput" rows="6" class="form-input" placeholder="Ví dụ: C B B C B B C C B C B B C A C D C C C C C B A..."></textarea>
+      <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1rem;">
+        <button class="btn-prev" onclick="app.closePasteAnswerModal()">Hủy</button>
+        <button class="btn-nav btn-next" onclick="app.applyPastedAnswers()">Chuẩn hóa & Áp dụng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
